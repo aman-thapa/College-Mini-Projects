@@ -1,7 +1,8 @@
 import os
+import sys
+import re
 import random
 import datetime
-import time
 import pyaudio
 import webbrowser
 import pyscreenshot
@@ -38,24 +39,24 @@ def takecommand():
     with sr.Microphone() as source:
         print("Listening...")
         r.pause_threshold = 1
+        r.adjust_for_ambient_noise(source, duration=1)
         audio = r.listen(source)
 
     try:
         print("Recognizing...")
         query = r.recognize_google(audio, language='en-in')
-        print(f"User said: {query}\n")
+        print(f"You said: {query}\n")
 
-    except Exception as e:
-        print(e)
-
+    except sr.UnknownValueError:
         print("Say that again please...")
         speak("Say that again please...")
-        return "None"
+        query = takecommand()
 
     return query
 
 def battery():    
     battery = psutil.sensors_battery()
+    print(f"Battery is at {battery.percent} %")
     speak("Battery is at")
     speak(battery.percent )
 
@@ -66,7 +67,7 @@ def screenshot():
 
 if __name__ == "__main__":
     wishme()
-    if 1:
+    while True:
         query = takecommand().lower()
         if 'who are you' in query:
             speak("Hello, I am Lia Version 1.O, a python interpreted voice assistant. I am here to help you.")
@@ -79,6 +80,18 @@ if __name__ == "__main__":
             print(results)
             speak(results)
 
+        elif 'open' in query:
+            websites = re.search('open (.+)', query)
+            if websites:
+                domain = websites.group(1)
+                print(domain)
+                url = 'http://www.' + domain + ".com"
+                webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
+                webbrowser.get('chrome').open(url)
+                speak("Requested website has been opened by me.")
+            else:
+                pass
+
         elif "where is" in query:
             webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
             query = query.split(" ")
@@ -86,59 +99,33 @@ if __name__ == "__main__":
             speak("Hold on , I will show you where " + location + " is.")
             webbrowser.get('chrome').open("https://www.google.nl/maps/place/" + location)
 
-        elif 'open download folder' in query:
-            downloadsPath = "C:\\Users\\amant\\Downloads"
+        elif 'folder' in query:
+            speak("What's the folder name?")
+            folder_name = takecommand()
+            downloadsPath = "C:\\Users\\amant\\" + folder_name
             os.startfile(downloadsPath)
-
-        elif 'open document folder' in query:
-            documentsPath = "C:\\Users\\amant\\Documents"
-            os.startfile(documentsPath)
 
         elif 'your creator' in query:
             speak("I am created by the 2nd year CSE students of DSU using python language.")
 
-        elif 'search'  in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            query = query.replace("search", "")
-            webbrowser.get('chrome').open(query)
+        elif 'screenshot' in query:
+            screenshot()
+            speak("Screenshot taken!")
 
-        elif 'open youtube' in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            webbrowser.get('chrome').open("youtube.com")
+        elif "today news" or "latest news" or 'show news' or "today's news" in query:
+            speak("Here are some headlines from the Times of India, Happy reading!")
+            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"))
+            webbrowser.get('chrome').open("https://timesofindia.indiatimes.com/")
 
-        elif 'open google' in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            webbrowser.get('chrome').open("google.com")
-
-        elif 'open github' in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            webbrowser.get('chrome').open("github.com")
-
-        elif 'open quora' in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            webbrowser.get('chrome').open("https://www.quora.com/")
-
-        elif 'open twitter' in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            webbrowser.get('chrome').open("twitter.com")
-
-        elif 'open gmail' in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            webbrowser.get('chrome').open("gmail.com")
-
-        elif 'open linkedin' in query:
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
-            webbrowser.get('chrome').open("linkedin.com")
-
-        elif 'open V S code' in query:
+        elif 'V S code' in query:
             vsPath = "C:\\Users\\amant\\Microsoft VS Code\\Code.exe"
             os.startfile(vsPath)
 
-        elif 'open pycharm' in query:
+        elif 'pycharm' in query:
             pycharmPath = "C:\\Program Files\\JetBrains\\PyCharm Community Edition 2020.1.2\\bin\\pycharm64.exe"
             os.startfile(pycharmPath)
 
-        elif 'open chrome' in query:
+        elif 'chrome' in query:
             chromePath = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
             os.startfile(chromePath)
 
@@ -175,17 +162,10 @@ if __name__ == "__main__":
         elif 'battery' in query:
             battery()
 
-        elif 'take screenshot' or 'take a screenshot' in query:
-            screenshot()
-            speak("Screenshot taken!")
-    
-        elif "today news" or "latest news" or 'show news' or "today's news" in query:
-            speak("Here are some headlines from the Times of India, Happy reading!")
-            webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"))
-            webbrowser.get('chrome').open("https://timesofindia.indiatimes.com/")
-            time.sleep(6)
-
-        elif 'play music' or 'play songs' in query:
+        elif 'exit' in query:
+            sys.exit(speak("Ok sir, Take Care."))
+        
+        elif 'music' or 'songs' in query:
             music_direc = 'C:\\Users\\amant\\Downloads\\py project'
             songs = os.listdir(music_direc)
             print(songs)
