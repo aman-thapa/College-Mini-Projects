@@ -1,6 +1,6 @@
-# Python Mini Project
+# 1. Python Mini Project
 ## Voice assistant
-###### ***Features-***
+###### ***About the Project-***
 * Opens any webpage
 * Opens selected apps
 * Predicts time
@@ -9,4 +9,9 @@
 * Info. from wikipedia and more.
 
 ---
-**My LinkedIn Profile:** [Aman Thapa](https://www.linkedin.com/in/aman-thapa-6a35571a2/)
+# 2. Web Tech Project
+## Responsive Website
+###### ***About the Project-***
+
+---
+**LinkedIn:** [Aman Thapa](https://www.linkedin.com/in/aman-thapa-6a35571a2/)
